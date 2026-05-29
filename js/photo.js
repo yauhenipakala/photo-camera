@@ -110,6 +110,45 @@
         log(error.message || error);
     }
 
+    function handlePermissionError(err) {
+        _w.console.error(err);
+        var message;
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            message = 'Camera access was denied. Please allow camera access in your browser settings and reload the page.';
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            message = 'No camera was found on this device.';
+        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+            message = 'Camera is already in use by another application.';
+        } else if (err.name === 'OverconstrainedError') {
+            message = 'No camera satisfies the requested constraints.';
+        } else if (err.name === 'SecurityError') {
+            message = 'Camera access is blocked by a security policy. Make sure the page is served over HTTPS or localhost.';
+        } else {
+            message = err.message || 'An unknown error occurred while accessing the camera.';
+        }
+        log(message);
+    }
+
+    function requestPermission() {
+        if (_w.isSecureContext === false) {
+            log('Camera access requires a secure connection. Please open this page over HTTPS or from localhost.');
+            return;
+        }
+
+        if (!_w.navigator.mediaDevices || !_w.navigator.mediaDevices.getUserMedia) {
+            log('Camera API is not supported in this browser. Try upgrading to a recent version of Safari, Chrome, or Firefox.');
+            return;
+        }
+
+        _w.navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function (tempStream) {
+                // Permission granted — stop the temporary stream and enumerate real devices
+                tempStream.getTracks().forEach(function (track) { track.stop(); });
+                start();
+            })
+            .catch(handlePermissionError);
+    }
+
     function initGetUserMedia(deviceId) {
         if (!deviceId) {
             log('Selected device not loaded [DeviceId="' + deviceId + '"]');
@@ -182,7 +221,7 @@
     }
 
     // main
-    start();
+    requestPermission();
 
     // events
 
