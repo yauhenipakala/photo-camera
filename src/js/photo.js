@@ -1,7 +1,7 @@
 /*global
   window
 */
-import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
+import { applyPixelFilter, canvasFilterSupported, cssFilter } from './filters.js';
 
 (function (_w, _d) {
   'use strict';
@@ -19,29 +19,9 @@ import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
     download = _d.querySelector('#download'),
     isMirroringEnabled = false,
     _stream = null,
-    filtersMap = {
-      none: 'none',
-      blackandwhite: 'grayscale(1)',
-      huerotate: 'hue-rotate(90deg)',
-      sepia: 'sepia()',
-      invert: 'invert()',
-      contrast: 'contrast(200%)',
-      brightness: 'brightness(0.5)',
-      saturate: 'saturate()',
-      blur: 'blur(5px)'
-    },
     videoStyleTransform = 'scaleX(-1)';
 
   // function
-
-  function getFilter(value) {
-    try {
-      return filtersMap[value];
-    } catch (e) {
-      _w.console.error(e);
-      return 'none';
-    }
-  }
 
   function currentFilter() {
     return filters.querySelector('input:checked').value;
@@ -66,15 +46,23 @@ import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
 
+  // photo px per CSS px of the preview (the video is shown with object-fit: contain)
+  function previewScale(photoWidth, photoHeight) {
+    var shown = Math.min(video.clientWidth / photoWidth, video.clientHeight / photoHeight);
+    return shown > 0 ? 1 / shown : 1;
+  }
+
   function takePicture() {
 
     var context = canvas.getContext('2d'),
       filter = currentFilter(),
       // capture at the real stream size, so portrait cameras aren't stretched
       photoWidth = video.videoWidth || width,
-      photoHeight = video.videoHeight || height;
+      photoHeight = video.videoHeight || height,
+      scale;
 
     if (photoWidth && photoHeight) {
+      scale = previewScale(photoWidth, photoHeight);
       canvas.width = photoWidth;
       canvas.height = photoHeight;
 
@@ -85,13 +73,13 @@ import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
 
       // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter
       if (canvasFilterSupported) {
-        context.filter = getFilter(filter);
+        context.filter = cssFilter(filter, scale);
       }
 
       context.drawImage(video, 0, 0, photoWidth, photoHeight);
 
       if (!canvasFilterSupported) {
-        applyPixelFilter(context, filter);
+        applyPixelFilter(context, filter, scale);
       }
 
       photo.classList.add('has-photo');
@@ -281,7 +269,7 @@ import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
   }, false);
 
   filters.addEventListener('change', function (e) {
-    video.style.filter = getFilter(e.target.value);
+    video.style.filter = cssFilter(e.target.value);
     e.preventDefault();
   }, false);
 

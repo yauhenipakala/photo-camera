@@ -1,6 +1,20 @@
-// Pixel-level equivalents of the CSS filters used in photo.js, for browsers
-// without CanvasRenderingContext2D.filter (e.g. iOS Safari).
+// Photo filters: CSS filter strings for the preview and canvas, plus pixel-level
+// equivalents for browsers without CanvasRenderingContext2D.filter (e.g. iOS Safari).
 // Matrices follow https://drafts.fxtf.org/filter-effects/#ShorthandEquivalents
+
+// blur radius in CSS px of the preview
+var blurRadius = 5;
+
+var cssFilters = {
+  none: 'none',
+  blackandwhite: 'grayscale(1)',
+  huerotate: 'hue-rotate(90deg)',
+  sepia: 'sepia()',
+  invert: 'invert()',
+  contrast: 'contrast(200%)',
+  brightness: 'brightness(0.5)',
+  saturate: 'saturate()'
+};
 
 // m is a 3x4 row-major matrix: [r, g, b, offset] per output channel, offsets in 0..255
 function colorMatrix(m) {
@@ -95,7 +109,7 @@ function blur(sigma) {
   };
 }
 
-// keys match filtersMap in photo.js
+// keys match cssFilters, blur is handled separately because its size depends on scale
 var pixelFilters = {
   blackandwhite: colorMatrix(grayscale()),
   huerotate: colorMatrix(hueRotate(90)),
@@ -103,14 +117,22 @@ var pixelFilters = {
   invert: colorMatrix(linear(-1, 255)),
   contrast: colorMatrix(linear(2, 255 * (0.5 - 0.5 * 2))),
   brightness: colorMatrix(linear(0.5, 0)),
-  saturate: colorMatrix(saturate(1)),
-  blur: blur(5)
+  saturate: colorMatrix(saturate(1))
 };
 
 export var canvasFilterSupported = 'filter' in CanvasRenderingContext2D.prototype;
 
-export function applyPixelFilter(context, name) {
-  var filter = pixelFilters[name],
+// `scale` is image px per CSS px of the preview, so a captured photo is blurred
+// as much as the (downscaled) preview looks
+export function cssFilter(name, scale) {
+  if (name === 'blur') {
+    return 'blur(' + blurRadius * (scale || 1) + 'px)';
+  }
+  return cssFilters[name] || 'none';
+}
+
+export function applyPixelFilter(context, name, scale) {
+  var filter = name === 'blur' ? blur(blurRadius * (scale || 1)) : pixelFilters[name],
     canvas = context.canvas,
     image;
   if (!filter) {
