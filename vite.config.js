@@ -24,6 +24,9 @@ function minifyHtml() {
 export default defineConfig({
   root: 'src',
   plugins: [minifyHtml()],
+  server: {
+    host: '0.0.0.0',
+  },
   build: {
     outDir: '../dist',
     emptyOutDir: true,
