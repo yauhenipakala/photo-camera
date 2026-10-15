@@ -19,7 +19,7 @@
     _stream = null,
     filtersMap = {
       none: 'none',
-      blackandwhite: 'url(#blackandwhite)',
+      blackandwhite: 'grayscale(1)',
       huerotate: 'hue-rotate(90deg)',
       sepia: 'sepia()',
       invert: 'invert()',
