@@ -13,7 +13,7 @@ var cssFilters = {
   invert: 'invert()',
   contrast: 'contrast(200%)',
   brightness: 'brightness(0.5)',
-  saturate: 'saturate()'
+  saturate: 'saturate(2)'
 };
 
 // m is a 3x4 row-major matrix: [r, g, b, offset] per output channel, offsets in 0..255
@@ -117,7 +117,7 @@ var pixelFilters = {
   invert: colorMatrix(linear(-1, 255)),
   contrast: colorMatrix(linear(2, 255 * (0.5 - 0.5 * 2))),
   brightness: colorMatrix(linear(0.5, 0)),
-  saturate: colorMatrix(saturate(1))
+  saturate: colorMatrix(saturate(2))
 };
 
 export var canvasFilterSupported = 'filter' in CanvasRenderingContext2D.prototype;
