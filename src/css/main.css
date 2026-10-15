@@ -47,6 +47,8 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   min-height: 100dvh;
   padding-inline: max(var(--gap), env(safe-area-inset-left)) max(var(--gap), env(safe-area-inset-right));
@@ -94,6 +96,7 @@ select {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding-block: max(16px, env(safe-area-inset-top)) 16px;
@@ -118,9 +121,24 @@ select {
 
 .layout {
   display: grid;
+  flex: 1 0 auto;
+  align-content: start;
   gap: var(--gap);
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* footer, pushed to the bottom of the screen by .layout's flex-grow */
+
+.app-footer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 32px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
 }
 
 .stage {
