@@ -2,15 +2,13 @@
   "name": "photo-camera",
   "version": "1.0.1",
   "description": "Simple demo for taking photo from webcam with JavaScript.",
-  "main": "index.js",
-  "dependencies": {},
-  "devDependencies": {
-    "connect": "^3.7.0",
-    "serve-static": "^1.15.0"
-  },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -21,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/wcoder/photo-camera/issues"
   },
-  "homepage": "https://github.com/wcoder/photo-camera#readme"
+  "homepage": "https://github.com/wcoder/photo-camera#readme",
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0",
+    "vite": "^8.3.4"
+  }
 }
