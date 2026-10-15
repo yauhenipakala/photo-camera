@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import { minify } from 'html-minifier-terser';
 
 function minifyHtml() {
@@ -23,7 +24,8 @@ function minifyHtml() {
 
 export default defineConfig({
   root: 'src',
-  plugins: [minifyHtml()],
+  // HTTPS is required for camera access when opening the dev server from another device
+  plugins: [basicSsl(), minifyHtml()],
   server: {
     host: '0.0.0.0',
   },
