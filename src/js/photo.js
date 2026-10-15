@@ -104,14 +104,17 @@ import { applyPixelFilter, canvasFilterSupported, cssFilter } from './filters.js
     };
   }
 
-  function stopPlay() {
-    // disable stream
+  function stopStream() {
     if (_stream !== null) {
       _stream.getTracks().forEach(function (track) {
         track.stop();
       });
       _stream = null;
     }
+  }
+
+  function stopPlay() {
+    stopStream();
     // disable video
     video.pause();
     video.src = '';
@@ -177,13 +180,25 @@ import { applyPixelFilter, canvasFilterSupported, cssFilter } from './filters.js
         video: {
           width: width,
           height: height,
-          deviceId: deviceId
+          // exact, otherwise browsers (mobile especially) may keep the default camera
+          deviceId: { exact: deviceId }
         },
         audio: false
       };
 
+      // phones can't open a second camera while the current one is still running
+      stopStream();
+
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
       _w.navigator.mediaDevices.getUserMedia(constraints)
+        .catch(function (err) {
+          if (err.name !== 'OverconstrainedError') {
+            throw err;
+          }
+          // the exact device can't be opened, fall back to treating it as a preference
+          constraints.video.deviceId = deviceId;
+          return _w.navigator.mediaDevices.getUserMedia(constraints);
+        })
         .then(playStream)
         .catch(handleError);
     }
@@ -200,6 +215,14 @@ import { applyPixelFilter, canvasFilterSupported, cssFilter } from './filters.js
         }
       }
     });
+
+    // Safari keeps the disabled placeholder selected, so pick the first camera explicitly
+    if (!sources.value) {
+      var firstCamera = sources.querySelector('option:not([disabled])');
+      if (firstCamera) {
+        sources.value = firstCamera.value;
+      }
+    }
   }
 
   function start() {
