@@ -1,34 +1,34 @@
 .booth {
-    width: 810px;
-    height: 300px;
-    background-color: #ccc;
-    border: 10px solid #ddd;
-    margin: 0 auto;
-    position: relative;
+  width: 810px;
+  height: 300px;
+  background-color: #ccc;
+  border: 10px solid #ddd;
+  margin: 0 auto;
+  position: relative;
 }
 #video {
-    position: absolute;
-    top: 0;
-    left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 #video:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 #video::-webkit-media-controls {
-    display: none !important;
+  display: none !important;
 }
 #canvas {
-    position: absolute;
-    top: 38px;
-    right: 0;
-    clear: both;
-    width: 400px;
+  position: absolute;
+  top: 38px;
+  right: 0;
+  clear: both;
+  width: 400px;
 }
 .panel {
-    margin: 20px auto;
-    width: 810px;
+  margin: 20px auto;
+  width: 810px;
 }
 #error {
-    color: #f00;
+  color: #f00;
 }
