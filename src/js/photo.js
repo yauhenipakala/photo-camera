@@ -1,6 +1,8 @@
 /*global
   window
 */
+import { applyPixelFilter, canvasFilterSupported } from './pixel-filters.js';
+
 (function (_w, _d) {
   'use strict';
 
@@ -67,6 +69,7 @@
   function takePicture() {
 
     var context = canvas.getContext('2d'),
+      filter = currentFilter(),
       // capture at the real stream size, so portrait cameras aren't stretched
       photoWidth = video.videoWidth || width,
       photoHeight = video.videoHeight || height;
@@ -81,9 +84,15 @@
       }
 
       // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter
-      context.filter = getFilter(currentFilter());
+      if (canvasFilterSupported) {
+        context.filter = getFilter(filter);
+      }
 
       context.drawImage(video, 0, 0, photoWidth, photoHeight);
+
+      if (!canvasFilterSupported) {
+        applyPixelFilter(context, filter);
+      }
 
       photo.classList.add('has-photo');
       download.disabled = false;
