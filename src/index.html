@@ -2,52 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)">
   <title>Photo Camera | Web Camera</title>
 
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+  <header class="app-header">
+    <svg class="app-logo" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 4h6l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    <h1>Photo Camera</h1>
+  </header>
 
+  <main class="layout">
+    <section class="stage" aria-label="Camera">
+      <div class="viewfinder">
+        <video id="video" autoplay muted playsinline></video>
+      </div>
 
-  <div class="booth">
-    <video id="video" width="400" height="300"></video>
-    <canvas id="canvas" crossorigin="anonymous">
-  </div>
-  <div class="panel">
-    <button id="capture">Take photo</button>
-    <select id="sources">
-      <option disabled>Select camera:</option>
-    </select>
-    <select id="filters">
-      <option disabled>Select filter:</option>
-      <option value="none">None</option>
-      <option value="blackandwhite">B&W</option>
-      <option value="huerotate">Hue-Rotate</option>
-      <option value="sepia">Sepia</option>
-      <option value="invert">Invert</option>
-      <option value="contrast">Contrast 2x</option>
-      <option value="brightness">Brightness 50%</option>
-      <option value="saturate">Saturate</option>
-      <option value="blur">Blur</option>
-    </select>
-    <p><label>Mirroring (On/Off): <input type="checkbox" id="mirroring"></label></p>
-    <p id="error"></p>
-  </div>
+      <fieldset id="filters" class="filters">
+        <legend class="visually-hidden">Filter</legend>
+        <label class="chip"><input type="radio" name="filter" value="none" checked><span>None</span></label>
+        <label class="chip"><input type="radio" name="filter" value="blackandwhite"><span>B&amp;W</span></label>
+        <label class="chip"><input type="radio" name="filter" value="huerotate"><span>Hue-Rotate</span></label>
+        <label class="chip"><input type="radio" name="filter" value="sepia"><span>Sepia</span></label>
+        <label class="chip"><input type="radio" name="filter" value="invert"><span>Invert</span></label>
+        <label class="chip"><input type="radio" name="filter" value="contrast"><span>Contrast 2x</span></label>
+        <label class="chip"><input type="radio" name="filter" value="brightness"><span>Brightness 50%</span></label>
+        <label class="chip"><input type="radio" name="filter" value="saturate"><span>Saturate</span></label>
+        <label class="chip"><input type="radio" name="filter" value="blur"><span>Blur</span></label>
+      </fieldset>
 
+      <div class="controls">
+        <label class="field">
+          <span class="field-label">Camera</span>
+          <select id="sources">
+            <option disabled>Select camera</option>
+          </select>
+        </label>
 
-  <svg id="image" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <button id="capture" class="shutter" type="button" aria-label="Take photo"></button>
+
+        <label class="switch">
+          <input type="checkbox" id="mirroring" role="switch">
+          <span>Mirror</span>
+        </label>
+      </div>
+
+      <div id="error" class="error" role="alert"></div>
+    </section>
+
+    <aside class="result card" aria-label="Last photo">
+      <h2>Last photo</h2>
+      <div id="photo" class="photo">
+        <canvas id="canvas"></canvas>
+        <p class="placeholder">Your photo will appear here</p>
+      </div>
+      <button id="download" class="button" type="button" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/>
+        </svg>
+        Download
+      </button>
+    </aside>
+  </main>
+
+  <svg class="svg-defs" aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <defs>
-
       <filter id="blackandwhite">
         <feColorMatrix values="0.3333 0.3333 0.3333 0 0
                                0.3333 0.3333 0.3333 0 0
                                0.3333 0.3333 0.3333 0 0
                                0      0      0      1 0"/>
       </filter>
-
     </defs>
   </svg>
-
 
   <script type="module" src="js/photo.js"></script>
 </body>

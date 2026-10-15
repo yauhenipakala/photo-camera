@@ -13,6 +13,8 @@
     filters = _d.querySelector('#filters'),
     mirroring = _d.querySelector('#mirroring'),
     error = _d.querySelector('#error'),
+    photo = _d.querySelector('#photo'),
+    download = _d.querySelector('#download'),
     isMirroringEnabled = false,
     _stream = null,
     filtersMap = {
@@ -39,8 +41,14 @@
     }
   }
 
+  function currentFilter() {
+    return filters.querySelector('input:checked').value;
+  }
+
   function log(message) {
-    error.innerHTML += '<br>Error: ' + message;
+    var line = _d.createElement('div');
+    line.textContent = 'Error: ' + message;
+    error.appendChild(line);
   }
 
   function createOption(value, text) {
@@ -58,10 +66,14 @@
 
   function takePicture() {
 
-    var context = canvas.getContext('2d');
-    if (width && height) {
-      canvas.width = width;
-      canvas.height = height;
+    var context = canvas.getContext('2d'),
+      // capture at the real stream size, so portrait cameras aren't stretched
+      photoWidth = video.videoWidth || width,
+      photoHeight = video.videoHeight || height;
+
+    if (photoWidth && photoHeight) {
+      canvas.width = photoWidth;
+      canvas.height = photoHeight;
 
       if (!isMirroringEnabled) {
         context.translate(canvas.width, 0);
@@ -69,9 +81,12 @@
       }
 
       // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter
-      context.filter = getFilter(filters.value);
+      context.filter = getFilter(currentFilter());
 
-      context.drawImage(video, 0, 0, width, height);
+      context.drawImage(video, 0, 0, photoWidth, photoHeight);
+
+      photo.classList.add('has-photo');
+      download.disabled = false;
     } else {
       clearPhoto();
     }
@@ -220,6 +235,27 @@
     }
   }
 
+  function pad(value) {
+    return String(value).padStart(2, '0');
+  }
+
+  function downloadPhoto() {
+    var now = new Date(),
+      fileName = 'photo-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) +
+        '-' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds()) + '.png';
+
+    canvas.toBlob(function (blob) {
+      var url = _w.URL.createObjectURL(blob),
+        link = _d.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      _w.setTimeout(function () {
+        _w.URL.revokeObjectURL(url);
+      }, 0);
+    }, 'image/png');
+  }
+
   // main
   requestPermission();
 
@@ -237,6 +273,11 @@
 
   filters.addEventListener('change', function (e) {
     video.style.filter = getFilter(e.target.value);
+    e.preventDefault();
+  }, false);
+
+  download.addEventListener('click', function (e) {
+    downloadPhoto();
     e.preventDefault();
   }, false);
 
