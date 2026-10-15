@@ -24,6 +24,8 @@ function minifyHtml() {
 
 export default defineConfig({
   root: 'src',
+  // relative asset URLs, so the site works when served from any sub-folder
+  base: './',
   // HTTPS is required for camera access when opening the dev server from another device
   plugins: [basicSsl(), minifyHtml()],
   server: {
